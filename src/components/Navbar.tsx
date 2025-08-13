@@ -1,17 +1,43 @@
+'use client';
 import Link from 'next/link'
+import { Button } from './ui/Button'
+import { RiSparkling2Line } from 'react-icons/ri'
+import useAuth from '@/contexts/AuthContext';
 
 export default function Navbar() {
+   const { user, logout } = useAuth();
+
   return (
-    <nav className="fixed top-0 left-0 w-full bg-white/80 backdrop-blur-lg shadow-sm z-50">
-      <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
-        <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-          AI Resume
-        </Link>
-        <div className="flex gap-6 items-center">
-          <Link href="/dashboard" className="hover:text-blue-600 transition">Dashboard</Link>
-          <Link href="/auth/login" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-            Login
+    <nav className="bg-white/95 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
+      <div className="container mx-auto py-4">
+        <div className="flex items-center justify-between">
+          <Link href="/" className="flex items-center space-x-2">
+            <RiSparkling2Line className="h-8 w-8 text-purple-600" />
+            <span className="text-2xl font-bold gradient-text">AI Resume Builder</span>
           </Link>
+          
+          <div className="flex items-center space-x-4">
+            {user ? (
+              <>
+                <Link href="/dashboard">
+                  <Button variant="ghost">Dashboard</Button>
+                </Link>
+                <span className="text-sm text-gray-600">Welcome, {user.name}</span>
+                <Button onClick={logout} variant="outline">
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link href="/auth/login">
+                  <Button variant="ghost">Sign In</Button>
+                </Link>
+                <Link href="/auth/register">
+                  <Button>Get Started</Button>
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </nav>
