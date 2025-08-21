@@ -63,11 +63,28 @@ const DashboardPage: React.FC = () => {
       }
     }
   }
-  const deleteResume = (id: string) => {
-    const updatedResumes = drafts.filter(resume => resume.id !== id);
-    setDrafts(updatedResumes);
-    localStorage.setItem(`resumes_${user!.id}`, JSON.stringify(updatedResumes));
-    toasterSuccess('Resume deleted successfully');
+
+  const deleteResume = async (id: string) => {
+    if (user) {
+      try {
+        const url = `api/resumes/delete`;
+        await API.delete(url, { 
+          userId: user.id,
+          resumeId: id
+        });
+        setResumes(resumes.filter(resume => resume.id !== id));
+        toasterSuccess('Resume deleted successfully');
+      } catch (error) {
+        toasterError("Failed to delete resume. Please try again.");
+      }
+    }
+  };
+
+  const deleteDraft = (id: string) => {
+    const updatedDrafts = drafts.filter(draft => draft.id !== id);
+    setDrafts(updatedDrafts);
+    localStorage.setItem(`resumes_${user!.id}`, JSON.stringify(updatedDrafts));
+    toasterSuccess('Draft deleted successfully');
   };
 
   if (!user) {
@@ -190,7 +207,7 @@ const DashboardPage: React.FC = () => {
                           <Button
                             size="sm"
                             variant="ghost"
-                            onClick={() => deleteResume(resume.id)}
+                            onClick={() => deleteDraft(resume.id)}
                           >
                             <RiDeleteBinLine className="h-7 w-7 text-red-500" />
                           </Button>

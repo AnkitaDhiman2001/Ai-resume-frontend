@@ -1,7 +1,7 @@
-import React from 'react';
+'use client';
+import React, { useEffect } from 'react';
 
 import { RiSparkling2Line, RiFileTextLine} from 'react-icons/ri';
-import Navbar from '../components/Navbar';
 import Link from 'next/link';
 import { GoZap } from 'react-icons/go';
 import { LuUsers } from 'react-icons/lu';
@@ -9,10 +9,23 @@ import { LuUsers } from 'react-icons/lu';
 import { Button } from '@/components/ui/Button';
 import { FaArrowRightLong } from 'react-icons/fa6';
 import { Card, CardContent } from '@/components/ui/Card';
-
-console.log('HomePage component loaded');
+import useAuth from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 
 const HomePage: React.FC = () => {
+  const { user, isLoading } = useAuth();
+  const router = useRouter();
+
+
+  useEffect(() => {
+    if (isLoading) return;
+    if (user) {
+      router.push('/dashboard');
+      return;
+    }
+  }, [user, isLoading, router]);
+
+
   const features = [
     {
       icon: <RiSparkling2Line className="h-8 w-8 text-purple-600" />,
@@ -38,8 +51,7 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="min-h-screen">
-      {/* <Navbar /> */}
-      
+    
       <section className="bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 py-20 px-4">
         <div className="container mx-auto text-center animate-fade-in">
           <h1 className="text-5xl md:text-6xl font-bold mb-6">
