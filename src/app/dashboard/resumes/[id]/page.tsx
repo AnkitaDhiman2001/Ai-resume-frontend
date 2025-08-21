@@ -1,20 +1,55 @@
-export default function ViewResumePage({ params }: { params: { id: string } }) {
-  const resume = {
-    title: "Frontend Developer Resume",
-    summary: "Passionate frontend developer with 2+ years of experience...",
-    skills: ["React", "Next.js", "JavaScript"],
-  };
+'use client';
+import { toasterError } from "@/components/core/Toaster";
+import PreviewStep from "@/components/resume/PreviewStep";
+import useAuth from "@/contexts/AuthContext";
+import API from "@/utils/Api";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
+interface Resume {
+  id: string;
+  resume_title: string;
+  template_type: string | null;
+  updatedAt: string;
+  content: JSON;
+}
+export default function ViewResumePage() {
+    const params = useParams();
+  const { id } = params;
+
+  const [data, setData] = useState<Resume | null>(null);
+  const { user, isLoading } = useAuth();
+  const router = useRouter();
+
+    useEffect(() => {
+      if (isLoading) return;
+      if (!user) {
+        router.push('/auth/login');
+        return;
+      }
+      fetchResumes();
+    }, [user, isLoading, router]);
+
+   const fetchResumes = async () => {
+    if(user && id) {
+      try{
+        const url = `api/resumes/fetch/${user?.id}/${id}`;
+        const res = await API.get(url);
+
+        if (res.data) {
+          setData(res.data);
+        }
+      } catch (error) {
+        toasterError("Failed to complete resume. Please try again.");
+      }
+    }
+  }
+
+  if(!data) return null;
   return (
-    <div className="bg-white p-6 rounded-lg shadow">
-      <h1 className="text-3xl font-bold mb-4">{resume.title}</h1>
-      <p className="text-gray-600 mb-4">{resume.summary}</p>
-      <h2 className="text-xl font-semibold">Skills</h2>
-      <ul className="list-disc pl-6">
-        {resume.skills.map((skill, i) => (
-          <li key={i}>{skill}</li>
-        ))}
-      </ul>
+    <div className="p-8">
+      <button className="mb-4 px-4 py-2 bg-blue-500 text-white rounded" onClick={() => router.push('/dashboard')}>Back</button>
+      <PreviewStep data={data.content} templateId={data.template_type} />
     </div>
   );
 }
